@@ -18,7 +18,7 @@
     "nature-based",
     "biobased",
     "bio-based",
-    "innovation",
+    "biogenic CO2",
     "bioenergies",
     "biomaterials",
     "biopolymers",
@@ -36,17 +36,30 @@
     "e-fuels"
     "biogas"
     "biomethane"
+    "bionaphta"
     "biochar"
     "alternative proteins",
+    "plant-based proteins",
     "meat alternative",
     "fermentation",
     "precision fermentation",
+    "biomass fermentation",
+    "gas fermentation",
     "novel ingredients",
     "novel foods",
+    "algae",
+    "biostimulant",
     "bioinsecticide",
     "bioherbicide",
     "biofungicide",
     "bio-inputs",
     "bioinputs",
-  ]
+    "biorefinery",
+    "mechanical recycling",
+    "depolymerisation",
+    "thermochemical catalysis",
+    "gasification",
+    "pyrolisis",
+    "food waste",
+    ]
 }
