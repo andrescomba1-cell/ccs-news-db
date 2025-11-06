@@ -17,6 +17,7 @@
     "climate tech",
     "nature-based",
     "biobased",
+    "bio-based",
     "innovation",
     "bioenergies",
     "biomaterials",
@@ -32,6 +33,7 @@
     "biodiesel"
     "renewable diesel"
     "SAF"
+    "e-fuels"
     "biogas"
     "biomethane"
     "biochar"
@@ -40,9 +42,11 @@
     "fermentation",
     "precision fermentation",
     "novel ingredients",
+    "novel foods",
     "bioinsecticide",
     "bioherbicide",
     "biofungicide",
-    "biofungicide",
+    "bio-inputs",
+    "bioinputs",
   ]
 }
