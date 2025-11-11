@@ -1,4 +1,4 @@
-nname: Deploy Pages (ultra-robusto)
+name: Deploy Pages (ultra-robusto)
 
 on:
   workflow_dispatch:
