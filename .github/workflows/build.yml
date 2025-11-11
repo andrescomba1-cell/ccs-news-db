@@ -99,3 +99,4 @@
           <pre id="out" style="white-space:pre-wrap;font:14px/1.4 system-ui,Segoe UI,Roboto,Arial"></pre>
           <script>fetch('news.json').then(r=>r.json()).then(j=>{out.textContent=JSON.stringify(j,null,2)}).catch(_=>out.textContent='No news.json');</script>
           HTML
+
