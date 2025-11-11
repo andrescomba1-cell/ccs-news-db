@@ -1,9 +1,9 @@
-name: Deploy Pages (minimal)
+name: Deploy Pages (robusto)
 
 on:
-  workflow_dispatch:   # puedes lanzarlo a mano desde Actions
+  workflow_dispatch:
   push:
-    branches: [ main ] # y también en cada commit a main
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -21,30 +21,52 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare public (copy embed.html + news.json + write index.html)
+      - name: Debug repo root
         run: |
-          set -e
+          echo "== CONTENIDO DEL REPO =="
+          pwd
+          ls -la
+
+      - name: Prepare public (copy or create files)
+        shell: bash
+        run: |
+          set -euxo pipefail
+
           rm -rf public
           mkdir -p public
 
-          # Copiamos TU embed.html (está en la raíz del repo) a /public/
+          echo "== ¿Existe embed.html en la raíz? =="
           if [ -f "embed.html" ]; then
+            echo "✅ Sí, copiando embed.html"
             cp embed.html public/embed.html
           else
-            echo "ERROR: embed.html no existe en la raíz del repo." >&2
-            exit 1
+            echo "⚠️ No existe embed.html, creando uno mínimo"
+            cat > public/embed.html <<'HTML'
+            <!doctype html><meta charset="utf-8">
+            <title>CCS News (placeholder)</title>
+            <div id="grid">Loading…</div>
+            <script>
+              fetch('./news.json',{cache:'no-store'}).then(r=>r.json()).then(j=>{
+                const g=document.getElementById('grid');
+                if(!j.items||!j.items.length){g.textContent='No news.';return;}
+                g.innerHTML=j.items.map(it=>'<div>'+it.title+'</div>').join('');
+              }).catch(_=>{document.getElementById('grid').textContent='Failed to load.'});
+            </script>
+            HTML
           fi
 
-          # Copiamos news.json si existe; si no, creamos uno vacío para no romper
+          echo "== ¿Existe news.json en la raíz? =="
           if [ -f "news.json" ]; then
+            echo "✅ Sí, copiando news.json"
             cp news.json public/news.json
           else
+            echo "⚠️ No existe news.json, creando uno vacío"
             cat > public/news.json <<'JSON'
             {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
             JSON
           fi
 
-          # index.html simple (opcional)
+          echo "== Escribiendo index.html =="
           cat > public/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8">
@@ -55,8 +77,11 @@ jobs:
           </p>
           HTML
 
-          echo "== Public content =="
-          find public -maxdepth 1 -type f -printf "%f\n"
+          echo "== CONTENIDO DE public/ =="
+          ls -la public
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact to Pages
         uses: actions/upload-pages-artifact@v3
