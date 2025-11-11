@@ -21,10 +21,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Node para poder ejecutar el generador si está presente
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # === Genera news.json real si existen feeds.json + fetch_news.mjs ===
+      - name: Generate real news.json (if fetcher exists)
+        shell: bash
+        run: |
+          if [ -f "fetch_news.mjs" ] && [ -f "feeds.json" ]; then
+            echo "== Generando news.json desde RSS (fetch_news.mjs) =="
+            node --version
+            node fetch_news.mjs || echo "Generador devolvió error; seguimos con copia/placeholder"
+          else
+            echo "No hay fetch_news.mjs/feeds.json; se usará news.json si existe o se creará uno vacío."
+          fi
+
+      # === Prepara carpeta public y copia archivos ===
       - name: Preparar carpeta public
         shell: bash
         run: |
-          set -e
           rm -rf public
           mkdir -p public
 
@@ -38,17 +56,17 @@ jobs:
 
           echo "Validando y copiando news.json"
           if [ -f "news.json" ]; then
-            # Validación rápida con Node: si falla, creamos un JSON mínimo
+            # Si el JSON es inválido, creamos uno mínimo y NO fallamos el build
             node -e "JSON.parse(require('fs').readFileSync('news.json','utf8'))" \
-            && cp -f news.json public/news.json \
-            || (echo 'news.json inválido; creando placeholder' \
-                && echo '{\"generated_at\":\"'$(date -u +%FT%TZ)'\",\"count\":0,\"items\":[]}' > public/news.json)
+              && cp -f news.json public/news.json \
+              || (echo 'news.json inválido; creando placeholder' \
+                  && echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json)
           else
             echo "No existe news.json; creando placeholder vacío"
-            echo '{\"generated_at\":\"'$(date -u +%FT%TZ)'\",\"count\":0,\"items\":[]}' > public/news.json
+            echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json
           fi
 
-          # index.html básico para quien abra la raíz
+          # index.html básico para quien abra la raíz del site
           cat > public/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8">
