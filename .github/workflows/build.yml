@@ -1,9 +1,9 @@
 name: Deploy Pages (minimal)
 
 on:
-  workflow_dispatch:   # lo lanzas a mano
+  workflow_dispatch:   # puedes lanzarlo a mano desde Actions
   push:
-    branches: [ main ] # y también cuando haces commit a main
+    branches: [ main ] # y también en cada commit a main
 
 permissions:
   contents: read
@@ -21,24 +21,45 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare public (write embed.html + index.html)
+      - name: Prepare public (copy embed.html + write index.html)
         run: |
           set -e
           rm -rf public
           mkdir -p public
 
-          # --- ESTE embed.html usa la URL ABSOLUTA de tu JSON que ya funciona ---
-          cat > public/embed.html <<'HTML'
+          # Copiamos TU embed.html (el que está en la raíz del repo) a /public/.
+          if [ -f "embed.html" ]; then
+            cp embed.html public/embed.html
+          else
+            echo "ERROR: embed.html no existe en la raíz del repo." >&2
+            exit 1
+          fi
+
+          # index.html simple (opcional)
+          cat > public/index.html <<'HTML'
           <!doctype html>
-          <html lang="en">
-          <head>
           <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>CCS News Embed</title>
-          <style>
-            :root{--brand:#0a6650}
-            body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#fff;color:#111827}
-            .wrap{max-width:1200px;margin:0 auto;padding:0 16px}
-            h2{font-weight:700;color:var(--brand);margin:18px 0}
-            #ccs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin:20px 0 32px}
-            .card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;transition:transform .2s,box
+          <title>CCS News</title>
+          <p style="font-family:system-ui,Segoe UI,Roboto,Arial">
+            This is the root of CCS News Pages.<br>
+            See <a href="embed.html">embed.html</a>.
+          </p>
+          HTML
+
+          echo "== Public content =="
+          find public -maxdepth 1 -type f -printf "%f\n"
+
+      - name: Upload artifact to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
