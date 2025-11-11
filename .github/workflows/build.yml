@@ -1,12 +1,63 @@
+name: Build & Deploy News
+
+on:
+  workflow_dispatch:
+  schedule:
+    # corre cada 6 horas
+    - cron: "0 */6 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Dependencias mínimas si tu fetch usa rss-parser o node-fetch.
+      # Quita esta parte si no las necesitas.
+      - name: Install optional deps
+        run: |
+          npm i rss-parser@3 node-fetch@3 || true
+
+      - name: Build news.json (tolerante a errores)
+        run: |
+          set -e
+          if [ -f "fetch_news.js" ]; then
+            echo "Running fetch_news.js to build news.json"
+            node fetch_news.js || true
+          fi
+          if [ ! -f "news.json" ]; then
+            echo "news.json not found, writing placeholder"
+            cat > news.json <<'JSON'
+            {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
+            JSON
+          fi
+          echo "== news.json =="
+          wc -c news.json || true
+          head -c 400 news.json || true
+          echo
+
       - name: Prepare public folder
         run: |
           set -e
           mkdir -p public
-
-          # Copiamos el JSON generado
           cp news.json public/news.json
 
-          # Creamos embed.html (el que mostrará las tarjetas dentro del iframe)
+          # ------- EMBED.HTML (iframe destino) -------
           cat > public/embed.html <<'HTML'
           <!doctype html>
           <html lang="en">
@@ -49,7 +100,7 @@
               parent.postMessage({type:'ccs-embed-height',height:h}, '*');
             }
             function img(it){
-              if (it.image && /^https?:\/\//i.test(it.image)) return it.image;
+              if (it.image && /^https?:\\/\\//i.test(it.image)) return it.image;
               var q = (it.tags && it.tags[0]) ? encodeURIComponent(it.tags[0]) : "bioeconomy";
               return "https://source.unsplash.com/800x450/?" + q;
             }
@@ -93,10 +144,26 @@
           </html>
           HTML
 
-          # (opcional) index.html simple por si visitas la raíz del Pages
+          # ------- index.html simple (opcional) -------
           cat > public/index.html <<'HTML'
-          <!doctype html><meta charset="utf-8"><title>CCS News API</title>
-          <pre id="out" style="white-space:pre-wrap;font:14px/1.4 system-ui,Segoe UI,Roboto,Arial"></pre>
-          <script>fetch('news.json').then(r=>r.json()).then(j=>{out.textContent=JSON.stringify(j,null,2)}).catch(_=>out.textContent='No news.json');</script>
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>CCS News</title>
+          <p style="font-family:system-ui,Segoe UI,Roboto,Arial">This is the root of CCS News Pages.<br>
+          See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.</p>
           HTML
 
+      - name: Upload artifact to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
