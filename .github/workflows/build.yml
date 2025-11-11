@@ -1,4 +1,4 @@
-name: Deploy Pages (ultra-robusto)
+name: Deploy Pages (simple y robusto)
 
 on:
   workflow_dispatch:
@@ -21,58 +21,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug repo root (ls)
-        run: |
-          echo "== PWD ==" && pwd
-          echo "== ls -la (root) ==" && ls -la
-
-      - name: Prepare public (no fail)
+      - name: Preparar carpeta public
         shell: bash
         run: |
           set -e
-          echo "== Preparando public/ =="
-
-          rm -rf public || true
+          rm -rf public
           mkdir -p public
 
-          echo "== Copiando/creando embed.html =="
+          echo "Copiando embed.html (si existe)"
           if [ -f "embed.html" ]; then
             cp -f embed.html public/embed.html
           else
-            cat > public/embed.html <<'HTML'
-            <!doctype html><meta charset="utf-8">
-            <title>CCS News (placeholder)</title>
-            <div id="grid">Loading…</div>
-            <script>
-              fetch('./news.json',{cache:'no-store'}).then(r=>r.json()).then(j=>{
-                const g=document.getElementById('grid');
-                if(!j.items||!j.items.length){g.textContent='No news.';return;}
-                g.innerHTML=j.items.map(it=>'<div>'+it.title+'</div>').join('');
-              }).catch(_=>{document.getElementById('grid').textContent='Failed to load.'});
-            </script>
-            HTML
+            echo "No hay embed.html en la raíz del repo"
+            exit 1
           fi
 
-          echo "== Copiando/creando news.json =="
+          echo "Validando y copiando news.json"
           if [ -f "news.json" ]; then
-            cp -f news.json public/news.json
+            # Validación rápida con Node: si falla, creamos un JSON mínimo
+            node -e "JSON.parse(require('fs').readFileSync('news.json','utf8'))" \
+            && cp -f news.json public/news.json \
+            || (echo 'news.json inválido; creando placeholder' \
+                && echo '{\"generated_at\":\"'$(date -u +%FT%TZ)'\",\"count\":0,\"items\":[]}' > public/news.json)
           else
-            cat > public/news.json <<'JSON'
-            {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
-            JSON
+            echo "No existe news.json; creando placeholder vacío"
+            echo '{\"generated_at\":\"'$(date -u +%FT%TZ)'\",\"count\":0,\"items\":[]}' > public/news.json
           fi
 
-          echo "== Generando index.html básico =="
+          # index.html básico para quien abra la raíz
           cat > public/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8">
           <title>CCS News</title>
           <p style="font-family:system-ui,Segoe UI,Roboto,Arial">
-            CCS News Pages • <a href="embed.html">embed.html</a> • <a href="news.json">news.json</a>
+            This is the CCS News root. See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.
           </p>
           HTML
 
-          echo "== Contenido de public/ =="
+          echo "Contenido de public/:"
           ls -la public
 
       - name: Configure Pages
@@ -84,11 +70,11 @@ jobs:
           path: ./public
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
