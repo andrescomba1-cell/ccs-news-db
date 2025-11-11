@@ -1,0 +1,28 @@
+{
+  "generated_at": "2025-11-11T10:00:00Z",
+  "count": 2,
+  "items": [
+    {
+      "id": "ex-0001",
+      "title": "Pirelli develops over 50% bio-based tyres for supercars",
+      "link": "https://example.com/pirelli-bio-based-tyres",
+      "date": "2025-11-05T09:30:00Z",
+      "summary": "The company announced a new compound with more than 50% bio-based content for high-performance vehicles.",
+      "image": "https://images.unsplash.com/photo-1542362567-b07e54358753",
+      "source": "Example News",
+      "lang": "en",
+      "tags": ["biopolymers","bio-based"]
+    },
+    {
+      "id": "ex-0002",
+      "title": "EU, French laws to boost circular fashion demand",
+      "link": "https://example.com/eu-circular-fashion",
+      "date": "2025-11-05T12:10:00Z",
+      "summary": "New regulations aim to accelerate circular business models across apparel and footwear.",
+      "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f",
+      "source": "Example News",
+      "lang": "en",
+      "tags": ["circular economy","textiles"]
+    }
+  ]
+}
