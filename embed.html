@@ -31,11 +31,10 @@
 
 <script>
 (function(){
-  // Usamos URL ABSOLUTA de tu JSON (¡esto evita problemas de rutas!)
-  var JSON_URL = "https://andrescomba1-cell.github.io/ccs-news-db/news.json";
+  // Lee el JSON que estará publicado junto a este archivo:
+  var JSON_URL = "./news.json";
   var grid = document.getElementById('ccs-grid');
 
-  // Ajuste de altura del iframe
   function sendHeight(){
     try{
       var h = document.body.scrollHeight;
