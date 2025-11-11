@@ -31,15 +31,17 @@
 
 <script>
 (function(){
-  var JSON_URL = "./news.json"; // servido desde el mismo GitHub Pages
+  // Usamos URL ABSOLUTA de tu JSON (¡esto evita problemas de rutas!)
+  var JSON_URL = "https://andrescomba1-cell.github.io/ccs-news-db/news.json";
   var grid = document.getElementById('ccs-grid');
 
-  // Ajuste de altura para el iframe
+  // Ajuste de altura del iframe
   function sendHeight(){
-    var h = document.body.scrollHeight;
-    parent.postMessage({type:'ccs-embed-height',height:h}, '*');
+    try{
+      var h = document.body.scrollHeight;
+      parent.postMessage({type:'ccs-embed-height',height:h}, '*');
+    }catch(_){}
   }
-  // Helpers
   function img(it){
     if (it.image && /^https?:\/\//i.test(it.image)) return it.image;
     var q = (it.tags && it.tags[0]) ? encodeURIComponent(it.tags[0]) : "bioeconomy";
@@ -56,7 +58,6 @@
       var items = (j && j.items) ? j.items : [];
       if(!items.length){ grid.textContent = 'No news.'; sendHeight(); return; }
 
-      // pinta 36 más recientes (ajusta si quieres)
       var frag = document.createDocumentFragment();
       items.slice(0,36).forEach(function(it){
         var div = document.createElement('div');
@@ -79,9 +80,8 @@
       setTimeout(sendHeight, 80);
     });
 
-  // Recalcular altura si cambia el contenido
   window.addEventListener('load', sendHeight);
-  new ResizeObserver(sendHeight).observe(document.body);
+  try{ new ResizeObserver(sendHeight).observe(document.body); }catch(_){}
 })();
 </script>
 </body>
