@@ -1,72 +1,101 @@
-name: Build & Deploy News
-
-on:
-  schedule:
-    - cron: "0 */6 * * *"     # cada 6 horas (ajusta si quieres)
-  workflow_dispatch:
-
-permissions:
-  contents: write          # para hacer git push si lo necesitas
-  pages: write             # para desplegar a GitHub Pages
-  id-token: write          # requerido por deploy-pages
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Validate feeds.json
-        run: |
-          python - <<'PY'
-          import json,sys
-          with open('feeds.json','r',encoding='utf-8') as f:
-            json.load(f)
-          print("feeds.json OK")
-          PY
-
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Build news.json
-        run: |
-          node -v
-          node fetch_news.mjs
-          test -f news.json && echo "news.json generado" || (echo "NO existe news.json" && exit 1)
-
-      # 👇 CREAR LA CARPETA QUE LUEGO SUBIMOS A PAGES
       - name: Prepare public folder
         run: |
+          set -e
           mkdir -p public
+
+          # Copiamos el JSON generado
           cp news.json public/news.json
-          # si quieres un index, opcional:
-          cat > public/index.html <<'HTML'
+
+          # Creamos embed.html (el que mostrará las tarjetas dentro del iframe)
+          cat > public/embed.html <<'HTML'
           <!doctype html>
+          <html lang="en">
+          <head>
           <meta charset="utf-8">
-          <title>CCS News API</title>
-          <pre id="out" style="white-space:pre-wrap;"></pre>
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>CCS News Embed</title>
+          <style>
+            :root{--brand:#0a6650}
+            body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#fff;color:#111827}
+            .wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+            h2{font-weight:700;color:var(--brand);margin:18px 0}
+            #ccs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin:20px 0 32px}
+            .card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+            .card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+            .card figure{aspect-ratio:16/9;overflow:hidden;background:#f3f4f6;margin:0}
+            .card img{width:100%;height:100%;object-fit:cover;display:block}
+            .body{padding:14px 16px 18px}
+            .body h3{font-size:17px;margin:0 0 6px}
+            .body h3 a{color:var(--brand);text-decoration:none}
+            .body h3 a:hover{text-decoration:underline}
+            .body p{font-size:14px;color:#475467;margin:0}
+            .meta{font-size:12px;color:#6b7280;margin-top:8px}
+            @media (max-width:768px){#ccs-grid{grid-template-columns:1fr}}
+          </style>
+          </head>
+          <body>
+          <div class="wrap">
+            <h2>News</h2>
+            <div id="ccs-grid">Loading…</div>
+          </div>
+
           <script>
-          fetch('news.json').then(r=>r.json()).then(j=>{
-            out.textContent = JSON.stringify(j,null,2);
-          });
+          (function(){
+            var JSON_URL = "./news.json"; // servido desde el mismo Pages
+            var grid = document.getElementById('ccs-grid');
+
+            function sendHeight(){
+              var h = document.body.scrollHeight;
+              parent.postMessage({type:'ccs-embed-height',height:h}, '*');
+            }
+            function img(it){
+              if (it.image && /^https?:\/\//i.test(it.image)) return it.image;
+              var q = (it.tags && it.tags[0]) ? encodeURIComponent(it.tags[0]) : "bioeconomy";
+              return "https://source.unsplash.com/800x450/?" + q;
+            }
+            function fmt(d){
+              try{ return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(new Date(d)); }
+              catch{ return ''; }
+            }
+
+            fetch(JSON_URL, {cache:'no-store'})
+              .then(r=>r.json())
+              .then(j=>{
+                var items = (j && j.items) ? j.items : [];
+                if(!items.length){ grid.textContent = 'No news.'; sendHeight(); return; }
+                var frag = document.createDocumentFragment();
+                items.slice(0,36).forEach(function(it){
+                  var div = document.createElement('div');
+                  div.className='card';
+                  div.innerHTML = `
+                    <figure><img loading="lazy" src="${img(it)}" alt=""></figure>
+                    <div class="body">
+                      <h3><a href="${it.link}" target="_blank" rel="noopener">${it.title}</a></h3>
+                      <p>${(it.summary||'').slice(0,160)}</p>
+                      <div class="meta">${fmt(it.date)}${it.source?(' · '+it.source):''}</div>
+                    </div>`;
+                  frag.appendChild(div);
+                });
+                grid.textContent = '';
+                grid.appendChild(frag);
+                setTimeout(sendHeight, 80);
+              })
+              .catch(e=>{
+                grid.textContent='Failed to load.';
+                setTimeout(sendHeight, 80);
+              });
+
+            window.addEventListener('load', sendHeight);
+            new ResizeObserver(sendHeight).observe(document.body);
+          })();
           </script>
+          </body>
+          </html>
           HTML
 
-      - name: Upload artifact to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public          # << ahora sí existe
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # (opcional) index.html simple por si visitas la raíz del Pages
+          cat > public/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>CCS News API</title>
+          <pre id="out" style="white-space:pre-wrap;font:14px/1.4 system-ui,Segoe UI,Roboto,Arial"></pre>
+          <script>fetch('news.json').then(r=>r.json()).then(j=>{out.textContent=JSON.stringify(j,null,2)}).catch(_=>out.textContent='No news.json');</script>
+          HTML
