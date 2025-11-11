@@ -1,44 +1,40 @@
 {
   "feeds": [
     "https://news.google.com/rss/search?q=bioeconomy+OR+%22circular+economy%22+OR+decarbonization+OR+%22climate+technology%22&hl=en",
-    "https://news.google.com/rss/search?q=bio%C3%A9conomie+OR+%22%C3%A9conomie+circ%C3%BClaire%22+OR+d%C3%A9carbonation+OR+%22technologies+climatiques%22&hl=fr",
+    "https://news.google.com/rss/search?q=bio%C3%A9conomie+OR+%22%C3%A9conomie+circ%C3%Bulaire%22+OR+d%C3%A9carbonation+OR+%22technologies+climatiques%22&hl=fr",
     "https://news.google.com/rss/search?q=bioeconom%C3%ADa+OR+%22econom%C3%ADa+circular%22+OR+descarbonizaci%C3%B3n+OR+%22tecnolog%C3%ADa+clim%C3%A1tica%22&hl=es",
     "https://news.google.com/rss/search?q=Bio%C3%B6konomie+OR+%22Kreislaufwirtschaft%22+OR+Dekarbonisierung+OR+%22Klimaschutztechnologien%22&hl=de",
+
     "https://climate.ec.europa.eu/news_en?format=rss",
     "https://environment.ec.europa.eu/news_en?format=rss",
     "https://www.eea.europa.eu/en/newsroom/news/rss.xml",
     "https://www.irena.org/rss.xml",
-    "https://www.oecd.org/environment/rss.xml"
-    "https://worldbiomarketinsights.com/rss.xml"
-    "https://bio.news/category/bioeconomy/rss.xml",
-    "https://www.besustainablemagazine.com/rss.xml",
-    "https://bioenergytimes.com/category/all-news/rss.xml",
-    "https://renewable-carbon.eu/news/rss.xml",
+    "https://www.oecd.org/environment/rss.xml",
+
+    "https://renewable-carbon.eu/news/feed/",
     "https://biofuels-news.com/news_feed/rss.xml",
-    "https://www.ieabioenergy.com/latest-updates/rss.xml",
-    "https://www.argusmedia.com/en/news-and-insights/latest-market-news/rss.xml",
-    "https://www.biobased-diesel.com/news/rss.xml",
-    "https://biomassmagazine.com/rss.xml",
-    "https://www.chemeurope.com/en/rss.xml",
-    "https://www.bioplasticsmagazine.com/en/rss.xml",
-    "https://initiatives.weforum.org/bioeconomy-initiative/rss.xml",
-    "https://agfundernews.com/rss.xml",
-    "https://www.agribusinessglobal.com/rss.xml",
-    "https://www.https://www.agropages.com/rss.xml",
-    "https://www.foodnavigator.com/News/rss.xml",
-    "https://www.foodingredientsfirst.com/rss.xml",
-    "https://www.foodingredientsfirst.com/rss.xml",
-    "https://plantbasednews.org/rss.xml",
-    "https://www.eitfood.eu/news/rss.xml",
-    "https://algaeplanet.com/rss.xml",
-    "https://www.foodingredientsfirst.com/rss.xml",
-    "https://www.agtechnavigator.com/rss.xml",
-    "https://www.argusmedia.com/en/news-and-insights/latest-market-news/rss.xml",
-    "https://cen.acs.org/rss.xml",
+    "https://www.ieabioenergy.com/latest-updates/feed/",
+    "https://biomassmagazine.com/rss/",
+    "https://cen.acs.org/rss.html",
     "https://www.plasticsnews.com/rss.xml",
-    "lesechos.fr/rss.xml",
-    "https://www.euractiv.com/rss.xml",
-      ],
+    "https://www.foodnavigator.com/Info/Latest-news",
+    "https://www.foodingredientsfirst.com/RSS/LatestNews.xml",
+    "https://plantbasednews.org/feed/",
+    "https://algaeplanet.com/feed/",
+    "https://agfundernews.com/feed/",
+    "https://www.besustainablemagazine.com/feed/",
+    "https://www.bioplasticsmagazine.com/en/feed/",
+    "https://bio.news/feed/",
+    "https://www.agribusinessglobal.com/feed/",
+    "https://www.argusmedia.com/rss",
+    "https://www.hydrogeninsight.com/rss",
+    "https://www.pv-magazine.com/feed/",
+    "https://www.sustainableplastics.com/rss.xml",
+    "https://www.greenbiz.com/rss.xml",
+    "https://www.euractiv.com/feed/",
+    "https://agropages.com/rss.xml",
+    "https://www.foodingredientsfirst.com/rss.xml"
+  ],
   "tags": [
     "bioeconomy",
     "circular economy",
@@ -53,21 +49,20 @@
     "biopolymers",
     "biofuels",
     "biochemicals",
-    "regenereative agriculture",
+    "regenerative agriculture",
     "alternative proteins",
     "green chemistry",
     "biotech",
-    "green hydrogen"
-    "bioethanol"
-    "biodiesel"
-    "renewable diesel"
-    "SAF"
-    "e-fuels"
-    "biogas"
-    "biomethane"
-    "bionaphta"
-    "biochar"
-    "alternative proteins",
+    "green hydrogen",
+    "bioethanol",
+    "biodiesel",
+    "renewable diesel",
+    "SAF",
+    "e-fuels",
+    "biogas",
+    "biomethane",
+    "bionaphtha",
+    "biochar",
     "plant-based proteins",
     "meat alternative",
     "fermentation",
@@ -89,7 +84,7 @@
     "depolymerisation",
     "thermochemical catalysis",
     "gasification",
-    "pyrolisis",
-    "food waste",
-    ]
+    "pyrolysis",
+    "food waste"
+  ]
 }
