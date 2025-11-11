@@ -1,33 +1,72 @@
-name: Build News Database
+name: Build & Deploy News
+
 on:
   schedule:
-    - cron: "0 */6 * * *"  # every 6 hours
+    - cron: "0 */6 * * *"     # cada 6 horas (ajusta si quieres)
   workflow_dispatch:
+
+permissions:
+  contents: write          # para hacer git push si lo necesitas
+  pages: write             # para desplegar a GitHub Pages
+  id-token: write          # requerido por deploy-pages
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate feeds.json
+        run: |
+          python - <<'PY'
+          import json,sys
+          with open('feeds.json','r',encoding='utf-8') as f:
+            json.load(f)
+          print("feeds.json OK")
+          PY
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      - run: npm install rss-parser@3
-      - run: node fetch_news.mjs
-      - name: Upload to Pages
+          node-version: 20
+
+      - name: Build news.json
+        run: |
+          node -v
+          node fetch_news.mjs
+          test -f news.json && echo "news.json generado" || (echo "NO existe news.json" && exit 1)
+
+      # 👇 CREAR LA CARPETA QUE LUEGO SUBIMOS A PAGES
+      - name: Prepare public folder
+        run: |
+          mkdir -p public
+          cp news.json public/news.json
+          # si quieres un index, opcional:
+          cat > public/index.html <<'HTML'
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>CCS News API</title>
+          <pre id="out" style="white-space:pre-wrap;"></pre>
+          <script>
+          fetch('news.json').then(r=>r.json()).then(j=>{
+            out.textContent = JSON.stringify(j,null,2);
+          });
+          </script>
+          HTML
+
+      - name: Upload artifact to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: public          # << ahora sí existe
 
   deploy:
     needs: build
-    permissions:
-      pages: write
-      id-token: write
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
