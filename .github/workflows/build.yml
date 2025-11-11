@@ -1,11 +1,11 @@
-name: Deploy Pages (simple y robusto)
+name: Deploy Pages (fetch real news)
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
   schedule:
-    - cron: "0 6 * * *"   # todos los días a las 06:00 UTC
+    - cron: "0 6 * * *"   # cada día 06:00 UTC
 
 permissions:
   contents: read
@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -23,62 +23,54 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Node para poder ejecutar el generador si está presente
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # === Genera news.json real si existen feeds.json + fetch_news.mjs ===
-      - name: Generate real news.json (if fetcher exists)
+      - name: Build news.json from feeds (if files exist)
         shell: bash
         run: |
-          if [ -f "fetch_news.mjs" ] && [ -f "feeds.json" ]; then
-            echo "== Generando news.json desde RSS (fetch_news.mjs) =="
-            node --version
-            node fetch_news.mjs || echo "Generador devolvió error; seguimos con copia/placeholder"
+          set -e
+          if [[ -f fetch_news.mjs && -f feeds.json ]]; then
+            echo "Generating news.json from feeds…"
+            node fetch_news.mjs || echo "::warning ::fetch failed; will fall back to existing/placeholder"
           else
-            echo "No hay fetch_news.mjs/feeds.json; se usará news.json si existe o se creará uno vacío."
+            echo "No fetch_news.mjs/feeds.json found; will use existing news.json or placeholder"
+          fi
+          # si aún no existe news.json, crea placeholder
+          if [[ ! -f news.json ]]; then
+            echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > news.json
           fi
 
-      # === Prepara carpeta public y copia archivos ===
-      - name: Preparar carpeta public
+      - name: Prepare public
         shell: bash
         run: |
-          rm -rf public
-          mkdir -p public
+          set -e
+          rm -rf public && mkdir public
 
-          echo "Copiando embed.html (si existe)"
-          if [ -f "embed.html" ]; then
-            cp -f embed.html public/embed.html
+          # embed.html requerido
+          if [[ -f embed.html ]]; then
+            cp embed.html public/embed.html
           else
-            echo "No hay embed.html en la raíz del repo"
-            exit 1
+            echo "Missing embed.html in repo root"; exit 1
           fi
 
-          echo "Validando y copiando news.json"
-          if [ -f "news.json" ]; then
-            # Si el JSON es inválido, creamos uno mínimo y NO fallamos el build
-            node -e "JSON.parse(require('fs').readFileSync('news.json','utf8'))" \
-              && cp -f news.json public/news.json \
-              || (echo 'news.json inválido; creando placeholder' \
-                  && echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json)
-          else
-            echo "No existe news.json; creando placeholder vacío"
-            echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json
-          fi
+          # valida y copia news.json
+          node -e "JSON.parse(require('fs').readFileSync('news.json','utf8'))" \
+            && cp news.json public/news.json \
+            || (echo "::warning ::invalid news.json; creating placeholder" \
+                && echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json)
 
-          # index.html básico para quien abra la raíz del site
+          # índice mínimo
           cat > public/index.html <<'HTML'
-          <!doctype html>
-          <meta charset="utf-8">
-          <title>CCS News</title>
+          <!doctype html><meta charset="utf-8"><title>CCS News</title>
           <p style="font-family:system-ui,Segoe UI,Roboto,Arial">
-            This is the CCS News root. See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.
+            See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.
           </p>
           HTML
 
-          echo "Contenido de public/:"
+          echo "Public content:"
           ls -la public
 
       - name: Configure Pages
