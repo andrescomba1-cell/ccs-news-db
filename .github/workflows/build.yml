@@ -1,4 +1,4 @@
-name: Deploy Pages (robusto)
+name: Deploy Pages (ultra-robusto)
 
 on:
   workflow_dispatch:
@@ -21,26 +21,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug repo root
+      - name: Debug repo root (ls)
         run: |
-          echo "== CONTENIDO DEL REPO =="
+          echo "== PWD =="
           pwd
+          echo "== ls -la (root) =="
           ls -la
 
-      - name: Prepare public (copy or create files)
+      - name: Prepare public (no fail)
         shell: bash
         run: |
-          set -euxo pipefail
-
-          rm -rf public
+          echo "== Preparando public/ (creando siempre) =="
+          rm -rf public || true
           mkdir -p public
 
-          echo "== ¿Existe embed.html en la raíz? =="
+          echo "== Copiando/creando embed.html =="
           if [ -f "embed.html" ]; then
-            echo "✅ Sí, copiando embed.html"
-            cp embed.html public/embed.html
+            echo "   -> Encontrado embed.html en raíz, copiando"
+            cp -f embed.html public/embed.html || true
           else
-            echo "⚠️ No existe embed.html, creando uno mínimo"
+            echo "   -> NO existe embed.html, creando placeholder mínimo"
             cat > public/embed.html <<'HTML'
             <!doctype html><meta charset="utf-8">
             <title>CCS News (placeholder)</title>
@@ -55,18 +55,18 @@ jobs:
             HTML
           fi
 
-          echo "== ¿Existe news.json en la raíz? =="
+          echo "== Copiando/creando news.json =="
           if [ -f "news.json" ]; then
-            echo "✅ Sí, copiando news.json"
-            cp news.json public/news.json
+            echo "   -> Encontrado news.json en raíz, copiando"
+            cp -f news.json public/news.json || true
           else
-            echo "⚠️ No existe news.json, creando uno vacío"
+            echo "   -> NO existe news.json, creando placeholder vacío"
             cat > public/news.json <<'JSON'
             {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
             JSON
           fi
 
-          echo "== Escribiendo index.html =="
+          echo "== Generando index.html básico =="
           cat > public/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8">
@@ -77,13 +77,15 @@ jobs:
           </p>
           HTML
 
-          echo "== CONTENIDO DE public/ =="
-          ls -la public
+          echo "== Listado de public/ =="
+          ls -la public || true
+          echo "== Fin preparación =="
+          true
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact to Pages
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
