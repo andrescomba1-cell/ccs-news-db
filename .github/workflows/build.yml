@@ -35,11 +35,10 @@ jobs:
             exit 1
           fi
 
-          # Copiamos news.json si existe (recomendado)
+          # Copiamos news.json si existe; si no, creamos uno vacío para no romper
           if [ -f "news.json" ]; then
             cp news.json public/news.json
           else
-            # Fallback: crea un JSON vacío para no romper
             cat > public/news.json <<'JSON'
             {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
             JSON
