@@ -17,7 +17,7 @@
     { "name": "Biomass Magazine", "url": "https://biomassmagazine.com/rss/", "language": "en" },
     { "name": "Chemical & Engineering News", "url": "https://cen.acs.org/rss.html", "language": "en" },
     { "name": "Plastics News", "url": "https://www.plasticsnews.com/rss.xml", "language": "en" },
-    { "name": "Food Navigator", "url": "https://www.foodnavigator.com/Info/Latest-news", "language": "en" },
+    { "name": "Food Navigator (via RSS.app)", "url": "https://rss.app/feeds/53aABzENBZhacZDI.xml", "language": "en" },
     { "name": "Food Ingredients First", "url": "https://www.foodingredientsfirst.com/rss.xml", "language": "en" },
     { "name": "Plant Based News", "url": "https://plantbasednews.org/feed/", "language": "en" },
     { "name": "Algae Planet", "url": "https://algaeplanet.com/feed/", "language": "en" },
