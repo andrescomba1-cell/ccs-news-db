@@ -3,13 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CCS News Embed</title>
+<title>CCS News</title>
 <style>
   :root{--brand:#0a6650}
   body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#fff;color:#111827}
   .wrap{max-width:1200px;margin:0 auto;padding:0 16px}
   h2{font-weight:700;color:var(--brand);margin:18px 0}
-  #ccs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin:20px 0 32px}
+
+  /* buscador */
+  .searchbar{display:flex;gap:10px;margin:6px 0 16px}
+  .searchbar input{
+    flex:1;border:1px solid #dbe0e5;border-radius:12px;padding:12px 14px;font-size:16px
+  }
+  .searchbar input:focus{outline:none;border-color:#0a6650;box-shadow:0 0 0 3px rgba(10,102,80,.12)}
+
+  #ccs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin:10px 0 32px}
   .card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
   .card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
   .card figure{aspect-ratio:16/9;overflow:hidden;background:#f3f4f6;margin:0}
@@ -26,16 +34,23 @@
 <body>
 <div class="wrap">
   <h2>News</h2>
+
+  <!-- Buscador -->
+  <div class="searchbar">
+    <input id="q" type="search" placeholder="Search news, topics, tags… (press / to focus)" autocomplete="off">
+  </div>
+
   <div id="ccs-grid">Loading…</div>
 </div>
 
 <script>
 (function(){
-  // JSON publicado junto a este archivo (el workflow lo copia a /public/news.json)
   var JSON_URL = "./news.json";
   var grid = document.getElementById('ccs-grid');
+  var q = document.getElementById('q');
+  var ALL = []; // guardamos todos para filtrar
+  var DEBOUNCE;
 
-  // comunica altura al padre (para iFrame auto-height)
   function sendHeight(){
     try{
       var h = document.body.scrollHeight;
@@ -43,42 +58,80 @@
     }catch(_){}
   }
 
-  function img(it){
-    if (it.image && /^https?:\/\//i.test(it.image)) return it.image;
-    var q = (it.tags && it.tags[0]) ? encodeURIComponent(it.tags[0]) : "bioeconomy";
-    return "https://source.unsplash.com/800x450/?" + q;
+  function placeholderFor(it){
+    var tag = (it.tags && it.tags[0]) ? encodeURIComponent(it.tags[0]) : "bioeconomy";
+    return "https://source.unsplash.com/800x450/?" + tag;
   }
+
+  function fixHttp(url){
+    if (!url) return "";
+    if (url.startsWith("//")) return "https:" + url;
+    if (url.startsWith("http://")) return url.replace(/^http:\/\//i, "https://");
+    return url;
+  }
+
+  function imgUrl(it){
+    var u = fixHttp(it.image || "");
+    return u || placeholderFor(it);
+  }
+
   function fmt(d){
     try{ return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(new Date(d)); }
     catch{ return ''; }
   }
 
+  function render(list){
+    if(!list.length){ grid.textContent = 'No news.'; sendHeight(); return; }
+    var frag = document.createDocumentFragment();
+    list.forEach(function(it){
+      var div = document.createElement('div');
+      div.className='card';
+      var src = imgUrl(it);
+      div.innerHTML = `
+        <figure>
+          <img loading="lazy" referrerpolicy="no-referrer"
+               src="${src}"
+               onerror="this.onerror=null;this.src='${placeholderFor(it)}'">
+        </figure>
+        <div class="body">
+          <h3><a href="${it.link}" target="_blank" rel="noopener">${it.title}</a></h3>
+          <p>${(it.summary||'').slice(0,160)}</p>
+          <div class="meta">${fmt(it.date)}${it.source?(' · '+it.source):''}</div>
+        </div>`;
+      frag.appendChild(div);
+    });
+    grid.textContent = '';
+    grid.appendChild(frag);
+    setTimeout(sendHeight, 80);
+  }
+
+  function filter(){
+    var s = (q.value||"").trim().toLowerCase();
+    if(!s){ render(ALL); return; }
+    var parts = s.split(/\s+/);
+    var out = ALL.filter(function(it){
+      var hay = (it.title + " " + (it.summary||"") + " " + (it.source||"") + " " + (it.tags||[]).join(" ")).toLowerCase();
+      return parts.every(p => hay.includes(p));
+    });
+    render(out);
+  }
+
+  q.addEventListener('input', function(){
+    clearTimeout(DEBOUNCE);
+    DEBOUNCE = setTimeout(filter, 120);
+  });
+  window.addEventListener('keydown', function(e){
+    if (e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+  });
+
   fetch(JSON_URL, {cache:'no-store'})
     .then(r=>r.json())
     .then(j=>{
-      var items = (j && j.items) ? j.items : [];
-      if(!items.length){ grid.textContent = 'No news.'; sendHeight(); return; }
-
-      var frag = document.createDocumentFragment();
-      items.slice(0,36).forEach(function(it){
-        var div = document.createElement('div');
-        div.className='card';
-        div.innerHTML = `
-          <figure><img loading="lazy" src="${img(it)}" alt=""></figure>
-          <div class="body">
-            <h3><a href="${it.link}" target="_blank" rel="noopener">${it.title}</a></h3>
-            <p>${(it.summary||'').slice(0,160)}</p>
-            <div class="meta">${fmt(it.date)}${it.source?(' · '+it.source):''}</div>
-          </div>`;
-        frag.appendChild(div);
-      });
-      grid.textContent = '';
-      grid.appendChild(frag);
-      setTimeout(sendHeight, 80);
+      ALL = (j && j.items) ? j.items : [];
+      render(ALL);
     })
     .catch(e=>{
       grid.textContent='Failed to load.';
-      setTimeout(sendHeight, 80);
     });
 
   window.addEventListener('load', sendHeight);
