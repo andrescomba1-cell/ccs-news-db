@@ -21,18 +21,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare public (copy embed.html + write index.html)
+      - name: Prepare public (copy embed.html + news.json + write index.html)
         run: |
           set -e
           rm -rf public
           mkdir -p public
 
-          # Copiamos TU embed.html (el que está en la raíz del repo) a /public/.
+          # Copiamos TU embed.html (está en la raíz del repo) a /public/
           if [ -f "embed.html" ]; then
             cp embed.html public/embed.html
           else
             echo "ERROR: embed.html no existe en la raíz del repo." >&2
             exit 1
+          fi
+
+          # Copiamos news.json si existe (recomendado)
+          if [ -f "news.json" ]; then
+            cp news.json public/news.json
+          else
+            # Fallback: crea un JSON vacío para no romper
+            cat > public/news.json <<'JSON'
+            {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
+            JSON
           fi
 
           # index.html simple (opcional)
@@ -42,7 +52,7 @@ jobs:
           <title>CCS News</title>
           <p style="font-family:system-ui,Segoe UI,Roboto,Arial">
             This is the root of CCS News Pages.<br>
-            See <a href="embed.html">embed.html</a>.
+            See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.
           </p>
           HTML
 
