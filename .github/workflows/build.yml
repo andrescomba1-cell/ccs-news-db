@@ -1,4 +1,4 @@
-name: Deploy Pages (ultra-robusto)
+nname: Deploy Pages (ultra-robusto)
 
 on:
   workflow_dispatch:
@@ -23,24 +23,22 @@ jobs:
 
       - name: Debug repo root (ls)
         run: |
-          echo "== PWD =="
-          pwd
-          echo "== ls -la (root) =="
-          ls -la
+          echo "== PWD ==" && pwd
+          echo "== ls -la (root) ==" && ls -la
 
       - name: Prepare public (no fail)
         shell: bash
         run: |
-          echo "== Preparando public/ (creando siempre) =="
+          set -e
+          echo "== Preparando public/ =="
+
           rm -rf public || true
           mkdir -p public
 
           echo "== Copiando/creando embed.html =="
           if [ -f "embed.html" ]; then
-            echo "   -> Encontrado embed.html en raíz, copiando"
-            cp -f embed.html public/embed.html || true
+            cp -f embed.html public/embed.html
           else
-            echo "   -> NO existe embed.html, creando placeholder mínimo"
             cat > public/embed.html <<'HTML'
             <!doctype html><meta charset="utf-8">
             <title>CCS News (placeholder)</title>
@@ -57,10 +55,8 @@ jobs:
 
           echo "== Copiando/creando news.json =="
           if [ -f "news.json" ]; then
-            echo "   -> Encontrado news.json en raíz, copiando"
-            cp -f news.json public/news.json || true
+            cp -f news.json public/news.json
           else
-            echo "   -> NO existe news.json, creando placeholder vacío"
             cat > public/news.json <<'JSON'
             {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
             JSON
@@ -72,15 +68,12 @@ jobs:
           <meta charset="utf-8">
           <title>CCS News</title>
           <p style="font-family:system-ui,Segoe UI,Roboto,Arial">
-            This is the root of CCS News Pages.<br>
-            See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.
+            CCS News Pages • <a href="embed.html">embed.html</a> • <a href="news.json">news.json</a>
           </p>
           HTML
 
-          echo "== Listado de public/ =="
-          ls -la public || true
-          echo "== Fin preparación =="
-          true
+          echo "== Contenido de public/ =="
+          ls -la public
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -91,11 +84,11 @@ jobs:
           path: ./public
 
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
