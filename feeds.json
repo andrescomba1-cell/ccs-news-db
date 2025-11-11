@@ -1,0 +1,20 @@
+{
+  "feeds": [
+    { "name": "Google News – Bioeconomy (EN)", "url": "https://news.google.com/rss/search?q=bioeconomy+OR+%22circular+economy%22+OR+decarbonization+OR+%22climate+technology%22&hl=en", "language": "en" },
+    { "name": "EU Climate News", "url": "https://climate.ec.europa.eu/news_en?format=rss", "language": "en" },
+    { "name": "EU Environment News", "url": "https://environment.ec.europa.eu/news_en?format=rss", "language": "en" },
+    { "name": "EEA", "url": "https://www.eea.europa.eu/en/newsroom/news/rss.xml", "language": "en" },
+    { "name": "IRENA", "url": "https://www.irena.org/rss.xml", "language": "en" },
+    { "name": "Renewable Carbon", "url": "https://renewable-carbon.eu/news/feed/", "language": "en" },
+    { "name": "Biofuels News", "url": "https://biofuels-news.com/news_feed/rss.xml", "language": "en" },
+    { "name": "Biomass Magazine", "url": "https://biomassmagazine.com/rss/", "language": "en" },
+    { "name": "Food Ingredients First", "url": "https://www.foodingredientsfirst.com/rss.xml", "language": "en" },
+    { "name": "Hydrogen Insight", "url": "https://www.hydrogeninsight.com/rss", "language": "en" }
+  ],
+  "tags": [
+    "bioeconomy","circular economy","decarbonization","climate tech","biobased",
+    "bio-based","biofuels","biogas","biomethane","biochar","bioplastics",
+    "green hydrogen","SAF","e-fuels","recycling","biorefinery","algae",
+    "alternative proteins","regenerative agriculture"
+  ]
+}
