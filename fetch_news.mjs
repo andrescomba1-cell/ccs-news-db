@@ -5,7 +5,8 @@ import fs from "fs/promises";
 
 const FEEDS_FILE = "feeds.json";
 const OUT_FILE   = "news.json";
-const MAX_ITEMS  = 200; // límite total (recientes primero)
+const MAX_PER_FEED = 80;
+const MAX_GLOBAL   = 1200; // límite total (recientes primero)
 
 function clean(txt="") {
   return txt.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
