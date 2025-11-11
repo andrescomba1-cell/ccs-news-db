@@ -1,10 +1,9 @@
-name: Build & Deploy News
+name: Deploy Pages (minimal)
 
 on:
-  workflow_dispatch:
-  schedule:
-    # corre cada 6 horas
-    - cron: "0 */6 * * *"
+  workflow_dispatch:   # lo lanzas a mano
+  push:
+    branches: [ main ] # y también cuando haces commit a main
 
 permissions:
   contents: read
@@ -22,42 +21,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      # Dependencias mínimas si tu fetch usa rss-parser o node-fetch.
-      # Quita esta parte si no las necesitas.
-      - name: Install optional deps
-        run: |
-          npm i rss-parser@3 node-fetch@3 || true
-
-      - name: Build news.json (tolerante a errores)
+      - name: Prepare public (write embed.html + index.html)
         run: |
           set -e
-          if [ -f "fetch_news.js" ]; then
-            echo "Running fetch_news.js to build news.json"
-            node fetch_news.js || true
-          fi
-          if [ ! -f "news.json" ]; then
-            echo "news.json not found, writing placeholder"
-            cat > news.json <<'JSON'
-            {"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}
-            JSON
-          fi
-          echo "== news.json =="
-          wc -c news.json || true
-          head -c 400 news.json || true
-          echo
-
-      - name: Prepare public folder
-        run: |
-          set -e
+          rm -rf public
           mkdir -p public
-          cp news.json public/news.json
 
-          # ------- EMBED.HTML (iframe destino) -------
+          # --- ESTE embed.html usa la URL ABSOLUTA de tu JSON que ya funciona ---
           cat > public/embed.html <<'HTML'
           <!doctype html>
           <html lang="en">
@@ -71,99 +41,4 @@ jobs:
             .wrap{max-width:1200px;margin:0 auto;padding:0 16px}
             h2{font-weight:700;color:var(--brand);margin:18px 0}
             #ccs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin:20px 0 32px}
-            .card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
-            .card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-            .card figure{aspect-ratio:16/9;overflow:hidden;background:#f3f4f6;margin:0}
-            .card img{width:100%;height:100%;object-fit:cover;display:block}
-            .body{padding:14px 16px 18px}
-            .body h3{font-size:17px;margin:0 0 6px}
-            .body h3 a{color:var(--brand);text-decoration:none}
-            .body h3 a:hover{text-decoration:underline}
-            .body p{font-size:14px;color:#475467;margin:0}
-            .meta{font-size:12px;color:#6b7280;margin-top:8px}
-            @media (max-width:768px){#ccs-grid{grid-template-columns:1fr}}
-          </style>
-          </head>
-          <body>
-          <div class="wrap">
-            <h2>News</h2>
-            <div id="ccs-grid">Loading…</div>
-          </div>
-
-          <script>
-          (function(){
-            var JSON_URL = "./news.json"; // servido desde el mismo Pages
-            var grid = document.getElementById('ccs-grid');
-
-            function sendHeight(){
-              var h = document.body.scrollHeight;
-              parent.postMessage({type:'ccs-embed-height',height:h}, '*');
-            }
-            function img(it){
-              if (it.image && /^https?:\\/\\//i.test(it.image)) return it.image;
-              var q = (it.tags && it.tags[0]) ? encodeURIComponent(it.tags[0]) : "bioeconomy";
-              return "https://source.unsplash.com/800x450/?" + q;
-            }
-            function fmt(d){
-              try{ return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(new Date(d)); }
-              catch{ return ''; }
-            }
-
-            fetch(JSON_URL, {cache:'no-store'})
-              .then(r=>r.json())
-              .then(j=>{
-                var items = (j && j.items) ? j.items : [];
-                if(!items.length){ grid.textContent = 'No news.'; sendHeight(); return; }
-                var frag = document.createDocumentFragment();
-                items.slice(0,36).forEach(function(it){
-                  var div = document.createElement('div');
-                  div.className='card';
-                  div.innerHTML = `
-                    <figure><img loading="lazy" src="${img(it)}" alt=""></figure>
-                    <div class="body">
-                      <h3><a href="${it.link}" target="_blank" rel="noopener">${it.title}</a></h3>
-                      <p>${(it.summary||'').slice(0,160)}</p>
-                      <div class="meta">${fmt(it.date)}${it.source?(' · '+it.source):''}</div>
-                    </div>`;
-                  frag.appendChild(div);
-                });
-                grid.textContent = '';
-                grid.appendChild(frag);
-                setTimeout(sendHeight, 80);
-              })
-              .catch(e=>{
-                grid.textContent='Failed to load.';
-                setTimeout(sendHeight, 80);
-              });
-
-            window.addEventListener('load', sendHeight);
-            new ResizeObserver(sendHeight).observe(document.body);
-          })();
-          </script>
-          </body>
-          </html>
-          HTML
-
-          # ------- index.html simple (opcional) -------
-          cat > public/index.html <<'HTML'
-          <!doctype html>
-          <meta charset="utf-8">
-          <title>CCS News</title>
-          <p style="font-family:system-ui,Segoe UI,Roboto,Arial">This is the root of CCS News Pages.<br>
-          See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.</p>
-          HTML
-
-      - name: Upload artifact to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+            .card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;transition:transform .2s,box
