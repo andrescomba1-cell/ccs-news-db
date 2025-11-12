@@ -1,11 +1,11 @@
-name: Deploy Pages (fetch real news)
+name: Deploy Pages (simple y robusto)
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
   schedule:
-    - cron: "0 6 * * *"   # cada día 06:00 UTC
+    - cron: "0 6 * * *"   # todos los días 06:00 UTC
 
 permissions:
   contents: read
@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
       - name: Build news.json from feeds (if files exist)
         shell: bash
@@ -38,40 +38,41 @@ jobs:
           else
             echo "No fetch_news.mjs/feeds.json found; will use existing news.json or placeholder"
           fi
-          # si aún no existe news.json, crea placeholder
           if [[ ! -f news.json ]]; then
             echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > news.json
           fi
+          echo "news.json head:"
+          head -n 40 news.json || true
 
-      - name: Prepare public
+      - name: Preparar carpeta public
         shell: bash
         run: |
           set -e
-          rm -rf public && mkdir public
+          rm -rf public
+          mkdir -p public
 
-          # embed.html requerido
+          # embed
           if [[ -f embed.html ]]; then
-            cp embed.html public/embed.html
+            cp -f embed.html public/embed.html
           else
-            echo "Missing embed.html in repo root"; exit 1
+            echo "No hay embed.html"; exit 1
           fi
 
-          # valida y copia news.json
+          # news.json válido; si falla el parseo, placeholder
           node -e "JSON.parse(require('fs').readFileSync('news.json','utf8'))" \
-            && cp news.json public/news.json \
-            || (echo "::warning ::invalid news.json; creating placeholder" \
-                && echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json)
+          && cp -f news.json public/news.json \
+          || echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json
 
-          # índice mínimo
+          # index mínimo
           cat > public/index.html <<'HTML'
-          <!doctype html><meta charset="utf-8"><title>CCS News</title>
+          <!doctype html><meta charset="utf-8">
+          <title>CCS News</title>
           <p style="font-family:system-ui,Segoe UI,Roboto,Arial">
             See <a href="embed.html">embed.html</a> or <a href="news.json">news.json</a>.
           </p>
           HTML
 
-          echo "Public content:"
-          ls -la public
+          echo "Contenido de public/:"; ls -la public
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
