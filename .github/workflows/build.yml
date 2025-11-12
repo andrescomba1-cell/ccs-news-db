@@ -28,21 +28,39 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build news.json from feeds (if files exist)
+      -      - name: Build news.json from feeds (diagnóstico)
         shell: bash
         run: |
           set -e
-          if [[ -f fetch_news.mjs && -f feeds.json ]]; then
-            echo "Generating news.json from feeds…"
-            node fetch_news.mjs || echo "::warning ::fetch failed; will fall back to existing/placeholder"
+          echo "== Listando raíz del repo =="
+          ls -la
+
+          echo "== Validación de feeds.json =="
+          if [[ -f feeds.json ]]; then
+            node -e "JSON.parse(require('fs').readFileSync('feeds.json','utf8')); console.log('feeds.json OK')"
+            echo "Primeras líneas de feeds.json:"
+            head -n 40 feeds.json || true
           else
-            echo "No fetch_news.mjs/feeds.json found; will use existing news.json or placeholder"
+            echo "::error ::NO existe feeds.json en la raíz"
+            exit 1
           fi
-          if [[ ! -f news.json ]]; then
+
+          echo "== Ejecutando fetch_news.mjs =="
+          if [[ -f fetch_news.mjs ]]; then
+            node --trace-uncaught fetch_news.mjs || (echo "::warning ::fetch failed; will fall back to existing/placeholder" && exit 1)
+          else
+            echo "::error ::NO existe fetch_news.mjs en la raíz"
+            exit 1
+          fi
+
+          echo "== news.json resultante (head) =="
+          if [[ -f news.json ]]; then
+            head -n 40 news.json || true
+          else
+            echo "::warning ::NO se creó news.json; generando placeholder"
             echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > news.json
           fi
-          echo "news.json head:"
-          head -n 40 news.json || true
+
 
       - name: Preparar carpeta public
         shell: bash
