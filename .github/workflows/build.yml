@@ -5,7 +5,7 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: "0 6 * * *"   # todos los días 06:00 UTC
+    - cron: "0 6 * * *"  # todos los días 06:00 UTC
 
 permissions:
   contents: read
@@ -28,17 +28,18 @@ jobs:
         with:
           node-version: "20"
 
-      -      - name: Build news.json from feeds (diagnóstico)
+      # === Diagnóstico + fetch real ===
+      - name: Build news.json from feeds (diagnóstico)
         shell: bash
         run: |
           set -e
+
           echo "== Listando raíz del repo =="
           ls -la
 
           echo "== Validación de feeds.json =="
           if [[ -f feeds.json ]]; then
             node -e "JSON.parse(require('fs').readFileSync('feeds.json','utf8')); console.log('feeds.json OK')"
-            echo "Primeras líneas de feeds.json:"
             head -n 40 feeds.json || true
           else
             echo "::error ::NO existe feeds.json en la raíz"
@@ -47,7 +48,7 @@ jobs:
 
           echo "== Ejecutando fetch_news.mjs =="
           if [[ -f fetch_news.mjs ]]; then
-            node --trace-uncaught fetch_news.mjs || (echo "::warning ::fetch failed; will fall back to existing/placeholder" && exit 1)
+            node --trace-uncaught fetch_news.mjs || (echo '::warning ::fetch failed; fallback a placeholder si hace falta'; exit 1)
           else
             echo "::error ::NO existe fetch_news.mjs en la raíz"
             exit 1
@@ -61,7 +62,6 @@ jobs:
             echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > news.json
           fi
 
-
       - name: Preparar carpeta public
         shell: bash
         run: |
@@ -69,17 +69,17 @@ jobs:
           rm -rf public
           mkdir -p public
 
-          # embed
+          # embed.html debe estar en la raíz del repo
           if [[ -f embed.html ]]; then
             cp -f embed.html public/embed.html
           else
-            echo "No hay embed.html"; exit 1
+            echo "::error ::No hay embed.html en la raíz"; exit 1
           fi
 
-          # news.json válido; si falla el parseo, placeholder
+          # news.json: si parsea, lo copiamos; si no, placeholder
           node -e "JSON.parse(require('fs').readFileSync('news.json','utf8'))" \
-          && cp -f news.json public/news.json \
-          || echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json
+            && cp -f news.json public/news.json \
+            || echo '{"generated_at":"'"$(date -u +%FT%TZ)"'","count":0,"items":[]}' > public/news.json
 
           # index mínimo
           cat > public/index.html <<'HTML'
@@ -90,7 +90,8 @@ jobs:
           </p>
           HTML
 
-          echo "Contenido de public/:"; ls -la public
+          echo "Contenido de public/:"
+          ls -la public
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
