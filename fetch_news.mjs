@@ -19,13 +19,22 @@ async function readConfig() {
   return { feeds: cfg.feeds || [], tags: cfg.tags || [] };
 }
 
+function extractImageFromHtml(html = "") {
+  const m = html.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+  return m ? m[1] : "";
+}
+
 function bestImage(it) {
-  // rss2json suele entregar:
-  // - it.enclosure?.link
-  // - it.thumbnail
-  // - a veces nada; devolveremos vacío y el embed pone placeholder
+  // 1) rss2json standard fields
   if (it.enclosure && it.enclosure.link) return it.enclosure.link;
-  if (it.thumbnail) return it.thumbnail;   // útil para Google News / RSS.app
+  if (it.thumbnail) return it.thumbnail;
+
+  // 2) Try to grab first <img> from description/content HTML
+  const html = it.description || it.content || "";
+  const fromHtml = extractImageFromHtml(html);
+  if (fromHtml) return fromHtml;
+
+  // 3) Nothing found
   return "";
 }
 
