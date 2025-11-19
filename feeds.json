@@ -1,9 +1,26 @@
 {
   "feeds": [
-    { "name": "Google News – Bioeconomy (EN)", "url": "https://news.google.com/rss/search?q=bioeconomy+OR+%22circular+economy%22+OR+decarbonization+OR+%22climate+technology%22&hl=en", "language": "en" },
-    { "name": "Google News – Bioéconomie (FR)", "url": "https://news.google.com/rss/search?q=bio%C3%A9conomie+OR+%22%C3%A9conomie+circ%C3%Bulaire%22+OR+d%C3%A9carbonation+OR+%22technologies+climatiques%22&hl=fr", "language": "fr" },
-    { "name": "Google News – Bioeconomía (ES)", "url": "https://news.google.com/rss/search?q=bioeconom%C3%ADa+OR+%22econom%C3%ADa+circular%22+OR+descarbonizaci%C3%B3n+OR+%22tecnolog%C3%ADa+clim%C3%A1tica%22&hl=es", "language": "es" },
-    { "name": "Google News – Bioökonomie (DE)", "url": "https://news.google.com/rss/search?q=Bio%C3%B6konomie+OR+%22Kreislaufwirtschaft%22+OR+Dekarbonisierung+OR+%22Klimaschutztechnologien%22&hl=de", "language": "de" },
+    {
+  "name": "Google News – Bioeconomy (EN)",
+  "url": "https://news.google.com/rss/search?q=bioeconomy+OR+%22circular+economy%22&hl=en",
+  "language": "en"
+},
+{
+  "name": "Google News – Bioéconomie (FR)",
+  "url": "https://news.google.com/rss/search?q=bio%C3%A9conomie+OR+%22%C3%A9conomie+circ%C3%Bulaire%22&hl=fr",
+  "language": "fr"
+},
+{
+  "name": "Google News – Bioeconomía (ES)",
+  "url": "https://news.google.com/rss/search?q=bioeconom%C3%ADa+OR+%22econom%C3%ADa+circular%22&hl=es",
+  "language": "es"
+},
+{
+  "name": "Google News – Bioökonomie (DE)",
+  "url": "https://news.google.com/rss/search?q=Bio%C3%B6konomie+OR+%22Kreislaufwirtschaft%22&hl=de",
+  "language": "de"
+}
+
 
     { "name": "EU Climate News", "url": "https://climate.ec.europa.eu/news_en?format=rss", "language": "en" },
     { "name": "EU Environment News", "url": "https://environment.ec.europa.eu/news_en?format=rss", "language": "en" },
