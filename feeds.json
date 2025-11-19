@@ -1,48 +1,115 @@
 {
   "feeds": [
     {
-  "name": "Google News – Bioeconomy (EN)",
-  "url": "https://news.google.com/rss/search?q=bioeconomy+OR+%22circular+economy%22&hl=en",
-  "language": "en"
-},
-{
-  "name": "Google News – Bioéconomie (FR)",
-  "url": "https://news.google.com/rss/search?q=bio%C3%A9conomie+OR+%22%C3%A9conomie+circ%C3%Bulaire%22&hl=fr",
-  "language": "fr"
-},
-{
-  "name": "Google News – Bioeconomía (ES)",
-  "url": "https://news.google.com/rss/search?q=bioeconom%C3%ADa+OR+%22econom%C3%ADa+circular%22&hl=es",
-  "language": "es"
-},
-{
-  "name": "Google News – Bioökonomie (DE)",
-  "url": "https://news.google.com/rss/search?q=Bio%C3%B6konomie+OR+%22Kreislaufwirtschaft%22&hl=de",
-  "language": "de"
-}
+      "name": "Google News – Bioeconomy (EN)",
+      "url": "https://news.google.com/rss/search?q=bioeconomy+OR+%22circular+economy%22&hl=en",
+      "language": "en"
+    },
+    {
+      "name": "Google News – Bioéconomie (FR)",
+      "url": "https://news.google.com/rss/search?q=bio%C3%A9conomie+OR+%22%C3%A9conomie+circ%C3%Bulaire%22&hl=fr",
+      "language": "fr"
+    },
+    {
+      "name": "Google News – Bioeconomía (ES)",
+      "url": "https://news.google.com/rss/search?q=bioeconom%C3%ADa+OR+%22econom%C3%ADa+circular%22&hl=es",
+      "language": "es"
+    },
+    {
+      "name": "Google News – Bioökonomie (DE)",
+      "url": "https://news.google.com/rss/search?q=Bio%C3%B6konomie+OR+%22Kreislaufwirtschaft%22&hl=de",
+      "language": "de"
+    },
 
+    {
+      "name": "EU Climate News",
+      "url": "https://climate.ec.europa.eu/news_en?format=rss",
+      "language": "en"
+    },
+    {
+      "name": "EU Environment News",
+      "url": "https://environment.ec.europa.eu/news_en?format=rss",
+      "language": "en"
+    },
+    {
+      "name": "EEA",
+      "url": "https://www.eea.europa.eu/en/newsroom/news/rss.xml",
+      "language": "en"
+    },
+    {
+      "name": "IRENA – Renewable Energy",
+      "url": "https://www.irena.org/rss.xml",
+      "language": "en"
+    },
+    {
+      "name": "OECD Environment",
+      "url": "https://www.oecd.org/environment/rss.xml",
+      "language": "en"
+    },
 
-    { "name": "EU Climate News", "url": "https://climate.ec.europa.eu/news_en?format=rss", "language": "en" },
-    { "name": "EU Environment News", "url": "https://environment.ec.europa.eu/news_en?format=rss", "language": "en" },
-    { "name": "EEA", "url": "https://www.eea.europa.eu/en/newsroom/news/rss.xml", "language": "en" },
-    { "name": "IRENA – Renewable Energy", "url": "https://www.irena.org/rss.xml", "language": "en" },
-    { "name": "OECD Environment", "url": "https://www.oecd.org/environment/rss.xml", "language": "en" },
+    {
+      "name": "Renewable Carbon News",
+      "url": "https://renewable-carbon.eu/news/feed/",
+      "language": "en"
+    },
+    {
+      "name": "Biofuels News",
+      "url": "https://biofuels-news.com/news_feed/rss.xml",
+      "language": "en"
+    },
+    {
+      "name": "IEA Bioenergy – Latest Updates",
+      "url": "https://www.ieabioenergy.com/latest-updates/feed/",
+      "language": "en"
+    },
+    {
+      "name": "Biomass Magazine",
+      "url": "https://biomassmagazine.com/rss/",
+      "language": "en"
+    },
+    {
+      "name": "C&EN",
+      "url": "https://cen.acs.org/rss.html",
+      "language": "en"
+    },
+    {
+      "name": "Plastics News",
+      "url": "https://www.plasticsnews.com/rss.xml",
+      "language": "en"
+    },
 
-    { "name": "Renewable Carbon News", "url": "https://renewable-carbon.eu/news/feed/", "language": "en" },
-    { "name": "Biofuels News", "url": "https://biofuels-news.com/news_feed/rss.xml", "language": "en" },
-    { "name": "IEA Bioenergy – Latest Updates", "url": "https://www.ieabioenergy.com/latest-updates/feed/", "language": "en" },
-    { "name": "Biomass Magazine", "url": "https://biomassmagazine.com/rss/", "language": "en" },
-    { "name": "C&EN", "url": "https://cen.acs.org/rss.html", "language": "en" },
-    { "name": "Plastics News", "url": "https://www.plasticsnews.com/rss.xml", "language": "en" },
+    {
+      "name": "FoodNavigator (RSS.app)",
+      "url": "https://rss.app/feeds/53aABzENBZhacZDI.xml",
+      "language": "en"
+    },
+    {
+      "name": "Food Ingredients First",
+      "url": "https://www.foodingredientsfirst.com/rss.xml",
+      "language": "en"
+    },
 
-    { "name": "FoodNavigator (RSS.app)", "url": "https://rss.app/feeds/53aABzENBZhacZDI.xml", "language": "en" },
-    { "name": "Food Ingredients First", "url": "https://www.foodingredientsfirst.com/rss.xml", "language": "en" },
+    {
+      "name": "Plant Based News",
+      "url": "https://plantbasednews.org/feed/",
+      "language": "en"
+    },
+    {
+      "name": "Algae Planet",
+      "url": "https://algaeplanet.com/feed/",
+      "language": "en"
+    },
+    {
+      "name": "AgFunder News",
+      "url": "https://agfundernews.com/feed/",
+      "language": "en"
+    },
 
-    { "name": "Plant Based News", "url": "https://plantbasednews.org/feed/", "language": "en" },
-    { "name": "Algae Planet", "url": "https://algaeplanet.com/feed/", "language": "en" },
-    { "name": "AgFunder News", "url": "https://agfundernews.com/feed/", "language": "en" },
-
-    { "name": "Hydrogen Insight", "url": "https://www.hydrogeninsight.com/rss", "language": "en" }
+    {
+      "name": "Hydrogen Insight",
+      "url": "https://www.hydrogeninsight.com/rss",
+      "language": "en"
+    }
   ],
   "tags": [
     "bioeconomy", "circular economy", "decarbonization", "climate tech",
@@ -60,3 +127,4 @@
     "pyrolysis", "food waste"
   ]
 }
+
