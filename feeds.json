@@ -100,11 +100,6 @@
     },
 
     {
-      "name": "[Food & Ingredients] FoodNavigator",
-      "url": "https://rss.app/feeds/53aABzENBZhacZDI.xml",
-      "language": "en"
-    },
-    {
       "name": "[Food & Ingredients] Food Ingredients First",
       "url": "https://www.foodingredientsfirst.com/rss.xml",
       "language": "en"
@@ -142,8 +137,18 @@
     },
 
     {
-      "name": "[Bioeconomy Industry] World Bio Market Insights – News (RSS.app required)",
-      "url": "https://rss.app/feeds/worldbio.xml",
+      "name": "[Bioeconomy Industry] World Bio Market Insights – News",
+      "url": "https://politepol.com/fd/qAubRTjkVYs2.xml",
+      "language": "en"
+    },
+    {
+      "name": "[Bioeconomy Industry] Bioeconomy.info",
+      "url": "https://politepol.com/fd/PXAMPLqTjfQ3.xml",
+      "language": "en"
+    },
+    {
+      "name": "[Bioeconomy Industry] BioMarket Insights",
+      "url": "https://politepol.com/fd/hznYY9f4Eac7.xml",
       "language": "en"
     }
   ],
