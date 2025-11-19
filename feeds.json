@@ -79,7 +79,7 @@
     },
 
     {
-      "name": "FoodNavigator (RSS.app)",
+      "name": "FoodNavigator",
       "url": "https://rss.app/feeds/53aABzENBZhacZDI.xml",
       "language": "en"
     },
@@ -109,10 +109,119 @@
       "name": "Hydrogen Insight",
       "url": "https://www.hydrogeninsight.com/rss",
       "language": "en"
+    },
+
+    /* --- NEW BIOECONOMY SOURCES ADDED BELOW --- */
+
+    {
+      "name": "Bioeconomy.info",
+      "url": "https://rss.app/feeds/bioeconomyinfo.xml",
+      "language": "en"
+    },
+    {
+      "name": "BioMarket Insights",
+      "url": "https://rss.app/feeds/biomarketinsights.xml",
+      "language": "en"
+    },
+    {
+      "name": "CBE JU – Circular Bio-based Europe",
+      "url": "https://rss.app/feeds/cbeju.xml",
+      "language": "en"
+    },
+    {
+      "name": "BBI JU (Archive)",
+      "url": "https://rss.app/feeds/bbiju.xml",
+      "language": "en"
+    },
+    {
+      "name": "Bioenergy International",
+      "url": "https://rss.app/feeds/bioenergyinternational.xml",
+      "language": "en"
+    },
+    {
+      "name": "Green Chemistry – Chemistry World",
+      "url": "https://rss.app/feeds/greenchemistry.xml",
+      "language": "en"
+    },
+    {
+      "name": "Sustainable Plastics",
+      "url": "https://rss.app/feeds/sustainableplastics.xml",
+      "language": "en"
+    },
+    {
+      "name": "Packaging Europe – Sustainability",
+      "url": "https://rss.app/feeds/packagingeurope.xml",
+      "language": "en"
+    },
+    {
+      "name": "The Fish Site",
+      "url": "https://thefishsite.com/feed",
+      "language": "en"
+    },
+    {
+      "name": "The Spoon",
+      "url": "https://rss.app/feeds/thespoon.xml",
+      "language": "en"
+    },
+    {
+      "name": "Green Queen",
+      "url": "https://rss.app/feeds/greenqueen.xml",
+      "language": "en"
+    },
+    {
+      "name": "The Fermentation Association",
+      "url": "https://www.fermentationassociation.org/feed/",
+      "language": "en"
+    },
+    {
+      "name": "Recycling Today",
+      "url": "https://www.recyclingtoday.com/rss/",
+      "language": "en"
+    },
+    {
+      "name": "Circular Online (CIWM)",
+      "url": "https://rss.app/feeds/circularonline.xml",
+      "language": "en"
+    },
+    {
+      "name": "Waste Management World",
+      "url": "https://waste-management-world.com/api/rss",
+      "language": "en"
+    },
+    {
+      "name": "Bioenergy Insight",
+      "url": "https://rss.app/feeds/bioenergyinsight.xml",
+      "language": "en"
+    },
+    {
+      "name": "CleanTechnica – Bioenergy",
+      "url": "https://cleantechnica.com/category/bioenergy/feed/",
+      "language": "en"
+    },
+    {
+      "name": "Ethanol Producer Magazine",
+      "url": "https://ethanolproducer.com/rss/",
+      "language": "en"
+    },
+    {
+      "name": "CORDIS – EU Bioeconomy Projects",
+      "url": "https://cordis.europa.eu/rss?q=bioeconomy",
+      "language": "en"
+    },
+    {
+      "name": "FAO – Bioeconomy",
+      "url": "https://rss.app/feeds/faobioeconomy.xml",
+      "language": "en"
+    },
+    {
+      "name": "World Bioenergy Association",
+      "url": "https://rss.app/feeds/worldbioenergy.xml",
+      "language": "en"
     }
   ],
+
   "tags": [
-    "bioeconomy", "circular economy", "decarbonization", "climate tech",
+    "bioeconomy", "circular economy", "climate tech",
     "nature-based", "biobased", "bio-based", "biogenic CO2", "bioenergies",
     "biomaterials", "biopolymers", "biofuels", "biochemicals",
     "regenerative agriculture", "alternative proteins", "green chemistry",
@@ -127,4 +236,3 @@
     "pyrolysis", "food waste"
   ]
 }
-
